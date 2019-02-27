@@ -1,26 +1,73 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TouchManager : MonoBehaviour
 {
-    public List<List<PointNode>> ItemObjects = new List<List<PointNode>>();
+    //  public List<List<PointNode>> ItemObjects = new List<List<PointNode>>();
 
-
+    public RectTransform canvasRect;
     public List<PointNode> node = new List<PointNode>();
 
     public Transform MidPoint;
 
+    public int[] fingerIds = new int[3];
     // Start is called before the first frame update
+
+    public void initilization(int[] _fingerID, RectTransform _canvasRect) {
+        fingerIds = _fingerID;
+        canvasRect = _canvasRect;
+
+        float xoffset = -canvasRect.rect.width / 2;
+        float yoffset = -canvasRect.rect.height / 2;
+        foreach (var item in node)
+        {
+            item.xoffset = xoffset;
+            item.yoffset = yoffset;
+            item.FINGER_ID = fingerIds[node.IndexOf(item)];
+            item.isSetFingerId = true;
+        }
+    }
+
     void Start()
     {
         
+    }
+
+    public IEnumerator DestoryObject(int[] IDS) {
+
+        if (IDS == null)
+        {
+            yield return new WaitForSeconds(0);
+        }
+        else {
+            foreach (var itemNode in node)
+            {
+
+                for (int i = 0; i < IDS.Length; i++)
+                {
+
+                    if (IDS[i] == itemNode.FINGER_ID) {
+                     yield return StartCoroutine(touchInput.instance.SyncID());
+                       
+
+                        Destroy(this.gameObject,0.1F);
+                    }
+                } 
+            }
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
         MidPoint.localPosition = getCenterPos(node);
+        UpdateMidRotation();
+    }
+
+    void UpdateMidRotation() {
+        MidPoint.LookAt(node[0].transform);
     }
 
     Vector3 getCenterPos(List<PointNode> node) {
