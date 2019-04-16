@@ -36,13 +36,7 @@ public class PointNode : MonoBehaviour
                   //  Debug.Log("touchPositionX" + touch.position.x + "________" + "TransformPosition" + this.transform.localPosition.x);
 
                 }
-    
-
             }
-
-
         }
-
     }
-
 }

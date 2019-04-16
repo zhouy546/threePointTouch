@@ -9,19 +9,20 @@ public class touchInput : MonoBehaviour
 
     public const int pointDiv = 3;
 
-    public const float Re_angleA = 60f;
-    public const float Re_angleB = 60f;
-    public const float Re_angleC = 60f;
+    public const float Re_angleA = 60;
+    public const float Re_angleB = 60;
+    public const float Re_angleC = 60;
 
     public const float angleThreshold = 10f;
 
-    public const float MaxPerimeter = 1000;
+    public const float MaxPerimeter = 2000;
 
     public int temp;
 
     public List<int[]> triID = new List<int[]>();
     public List<int[]> perviousTriID = new List<int[]>();
 
+    public List<TouchManager> touchManagers = new List<TouchManager>();
 
     public GameObject PrefabNode;
 
@@ -31,8 +32,8 @@ public class touchInput : MonoBehaviour
         if (instance == null) {
             instance = this;
         }
-        EventCenter.AddListener(EventDefine.AddFinger, AddFinger);
-        EventCenter.AddListener(EventDefine.RemoveFinger, removeFineger);
+        //EventCenter.AddListener(EventDefine.AddFinger, AddFinger);
+        //EventCenter.AddListener(EventDefine.RemoveFinger, removeFineger);
     }
 
     // Update is called once per frame
@@ -61,30 +62,33 @@ public class touchInput : MonoBehaviour
 
     void AddFinger() {
         triID = getTriID();
-        int val = 0;
-        int pval = 0;
-        foreach (var item in triID)
-        {
-            foreach (var a in item)
-            {
-                val += a;
-            }
+        Debug.Log(triID.Count);
+        //int val = 0;
+        //int pval = 0;
+        //foreach (var item in triID)
+        //{
+        //    foreach (var a in item)
+        //    {
+        //        val += a;
+        //    }
             
-        }
+        //}int
 
-        foreach (var item in perviousTriID)
-        {
-            foreach (var a in item)
-            {
-                pval += a;
-            }
+        //foreach (var item in perviousTriID)
+        //{
+        //    foreach (var a in item)
+        //    {
+        //        pval += a;
+        //    }
 
-        }
+        //}
 
-        Debug.Log("Add finger");
+
+        //Debug.Log("Add finger");
         foreach (var item in triID)
         {
-            if (val!=pval) {
+            if (touchManagers.Count <= triID.Count)
+            {
                 GameObject g = Instantiate(PrefabNode);
                 g.transform.SetParent(this.transform);
                 g.transform.localPosition = Vector3.zero;
@@ -92,34 +96,45 @@ public class touchInput : MonoBehaviour
                 g.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
                 TouchManager touchManager = g.GetComponent<TouchManager>();
-                touchManager.initilization(item,this.GetComponent<RectTransform>());
-                StartCoroutine(SyncID());
-            }
+                touchManagers.Add(touchManager);
+                touchManager.initilization(item, this.GetComponent<RectTransform>());
+            }              //SyncID();
         }
      
     }
 
-    public IEnumerator SyncID() {
+    bool isContain(int[]a, int[] b) {
+        for (int i = 0; i < a.Length; i++)
+        {
+            if (a[i] != b[i]) {
+               return false;
+            }
+        }
+        return true;
+    }
+
+
+    public void SyncID() {
         perviousTriID = triID;
-        yield return new WaitForSeconds(0);
+    
     }
 
     void removeFineger() {
-        Debug.Log("Remove finger");
-       triID = getTriID();
+        //Debug.Log("Remove finger");
+    //   triID = getTriID();
 
 
-       StartCoroutine( RemoveTouchManager());     
+        RemoveTouchManager();     
     }
 
 
-    IEnumerator RemoveTouchManager() {
+    void RemoveTouchManager() {
 
 
         TouchManager[] touchManagers = FindObjectsOfType<TouchManager>();
         foreach (var item in touchManagers)
         {
-         yield return  StartCoroutine  ( item.DestoryObject(getRemoveInt()));
+       item.DestoryObject(getRemoveInt());
         }
 
     }
@@ -133,7 +148,7 @@ public class touchInput : MonoBehaviour
         {
             for (int i = 0; i < perviousID.Length; i++)
             {
-                Debug.Log("PERVIOUS____"+perviousID[i]);
+              //  Debug.Log("PERVIOUS____"+perviousID[i]);
                 perviousTemp.Add(perviousID[i]);
             }
         }
@@ -143,7 +158,7 @@ public class touchInput : MonoBehaviour
             for (int i = 0; i < triid.Length; i++)
             {
 
-                Debug.Log("Current____" + triid[i]);
+             //   Debug.Log("Current____" + triid[i]);
                 triIDTemp.Add(triid[i]);
             }
         }
@@ -247,7 +262,7 @@ public class touchInput : MonoBehaviour
 
         return Mathf.Sqrt(length_pow);
     }
-
+    //5选3
     IEnumerable<int[]> test(int PointCount) {
         int n = pointDiv;
         List<int> temp = new List<int>();

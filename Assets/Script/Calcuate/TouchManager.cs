@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TouchManager : MonoBehaviour
 {
     //  public List<List<PointNode>> ItemObjects = new List<List<PointNode>>();
+    public bool isTrackRoation;
 
     public RectTransform canvasRect;
     public List<PointNode> node = new List<PointNode>();
@@ -35,11 +36,11 @@ public class TouchManager : MonoBehaviour
         
     }
 
-    public IEnumerator DestoryObject(int[] IDS) {
+    public void DestoryObject(int[] IDS) {
 
         if (IDS == null)
         {
-            yield return new WaitForSeconds(0);
+
         }
         else {
             foreach (var itemNode in node)
@@ -49,8 +50,8 @@ public class TouchManager : MonoBehaviour
                 {
 
                     if (IDS[i] == itemNode.FINGER_ID) {
-                     yield return StartCoroutine(touchInput.instance.SyncID());
-                       
+                     touchInput.instance.SyncID();
+                        touchInput.instance.touchManagers.Remove(this);
 
                         Destroy(this.gameObject,0.1F);
                     }
@@ -67,7 +68,9 @@ public class TouchManager : MonoBehaviour
     }
 
     void UpdateMidRotation() {
-        MidPoint.LookAt(node[0].transform);
+        if (isTrackRoation) {
+            MidPoint.LookAt(node[0].transform);
+        }
     }
 
     Vector3 getCenterPos(List<PointNode> node) {
